@@ -1,8 +1,9 @@
 // Variables that will be used over and over
 
-let number1;
-let number2;
 let operator;
+let buffer;
+let pending;
+let wipeIt;
 
 const display = document.querySelector('.display');
 
@@ -54,8 +55,20 @@ numberButtons.forEach(button => {
 });
 
 function displayNumber(button) {
+    if (wipeIt) {
+        clearDisplay();             // WIP - meant to reset display if user just starts entering new numbers after finishing a calculation
+        buffer = null;              // Currently also wipes display if they hit an operator to do another calculation - fix this
+        operator = null;
+        wipeIt = null;
+    }
+    if (pending) {
+        buffer = makeNumber(display.textContent);
+        clearDisplay();
+        pending = 0;
+    }
     if (display.textContent.length < 12) {
         display.textContent += (button.textContent);
+        pending = 0;
     }
 }
 
@@ -70,16 +83,32 @@ operatorButtons.forEach(button => {
 });
 
 function dealWithOperator(button) {
-    console.log(button.id);
-    if (!number1) {
-        number1 = makeNumber(display.textContent);
-    } else {number2 = makeNumber(display.textContent);}
-    clearDisplay();
-    if (number1 && number2) {
-        console.log('Actual operation happens here')
+    let num = makeNumber(display.textContent);
+    if (!buffer) {
+        buffer = num;
     }
-    else {console.log('Get the operator somehow and save it here')}
+    else {
+        let result = operate(operator, buffer, num);
+        display.textContent = result;
+        buffer = result;
+    }
+    pending = 1;
+    operator = button.id;
 }
+
+// Equals sign button
+
+const equalsButton = document.querySelector('.equals');
+equalsButton.addEventListener('click', () => {
+    if (operator && buffer) {
+        let num = makeNumber(display.textContent);
+        let result = operate(operator, buffer, num);
+        display.textContent = result;
+        buffer = result;
+        operator = null;
+        wipeIt = 1;
+    }
+})
 
 
 // Helper functions
