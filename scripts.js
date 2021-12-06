@@ -6,6 +6,7 @@ let pending;
 let wipeIt;
 
 const display = document.querySelector('.display');
+display.textContent = '0';
 
 // Basic maths functions
 
@@ -55,20 +56,17 @@ numberButtons.forEach(button => {
 });
 
 function displayNumber(button) {
-    if (wipeIt) {
-        clearDisplay();             // WIP - meant to reset display if user just starts entering new numbers after finishing a calculation
-        buffer = null;              // Currently also wipes display if they hit an operator to do another calculation - fix this
-        operator = null;
-        wipeIt = null;
+    if (display.textContent == '0') {
+        clearDisplay();
     }
     if (pending) {
         buffer = makeNumber(display.textContent);
         clearDisplay();
-        pending = 0;
+        pending = null;
     }
     if (display.textContent.length < 12) {
         display.textContent += (button.textContent);
-        pending = 0;
+        pending = null;
     }
 }
 
@@ -104,12 +102,67 @@ equalsButton.addEventListener('click', () => {
         let num = makeNumber(display.textContent);
         let result = operate(operator, buffer, num);
         display.textContent = result;
-        buffer = result;
+        buffer = null;
         operator = null;
-        wipeIt = 1;
-    }
-})
+        pending = 1;        // Pending even though no operation is pending, because if user
+    }                       // enters new numbers here, it should do new calculation, not concatenate                   
+});
 
+// In place operators
+
+const inPlaceButtons = document.querySelectorAll('.inPlaceOp')
+inPlaceButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        operateInPlace(button);
+    });
+});
+
+function operateInPlace(button) {
+    let op = button.id;
+    let num = makeNumber(display.textContent);
+    let disp = display.textContent;
+    if (op == 'percent') {
+        display.textContent = num / 100;
+    }
+    else if (op == 'backspace') {
+        if (display.textContent.length == 1) {
+            display.textContent = 0;
+        }
+        else {
+            display.textContent = disp.slice(0, -1);
+        }        
+    }
+    else if (op == 'invert') {
+        display.textContent = 1 / num;
+    }
+    else if (op == 'square') {
+        display.textContent = num ** 2;
+    }
+    else if (op == 'sqrt') {
+        display.textContent = Math.sqrt(num);
+    }
+    else if (op == 'neg') {
+        display.textContent = - num;
+    }
+}
+
+// CE and CE buttons
+
+const deleteButtons = document.querySelectorAll('.delete');
+deleteButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        deleteThings(button);
+    });
+});
+
+function deleteThings(button) {
+    display.textContent = '0';
+    if (button.id == 'C') {
+        buffer = null;
+        operator = null;
+        pending = null;
+    }
+}
 
 // Helper functions
 

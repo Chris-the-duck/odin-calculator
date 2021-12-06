@@ -11,15 +11,15 @@
             <div class="display"></div>
             <div class="buttonbox">
                 <div class="buttonrow">
-                    <button>%</button>
-                    <button>CE</button>
-                    <button>C</button>
-                    <button>&#9003;</button>
+                    <button class="inPlaceOp" id="percent">%</button>
+                    <button class="delete" id="CE">CE</button>
+                    <button class="delete" id="C">C</button>
+                    <button class="inPlaceOp" id="backspace">&#9003;</button>
                 </div>
                 <div class="buttonrow">
-                    <button>1/x</button>
-                    <button>x<sup>2</sup></button>
-                    <button>&radic;</button>
+                    <button class="inPlaceOp" id="invert">1/x</button>
+                    <button class="inPlaceOp" id="square">x<sup>2</sup></button>
+                    <button class="inPlaceOp" id="sqrt">&radic;</button>
                     <button class="operator" id="divide">&div;</button>
                 </div>
                 <div class="buttonrow">
@@ -41,7 +41,7 @@
                     <button class="operator" id="+">+</button>
                 </div>
                 <div class="buttonrow">
-                    <button>+/-</button>
+                    <button class="inPlaceOp" id="neg">+/-</button>
                     <button class="num">0</button>
                     <button class="num">.</button>
                     <button class="equals">=</button>
