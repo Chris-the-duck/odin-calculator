@@ -37,7 +37,7 @@ function operate(operator, num1, num2) {
     }
     else if (operator == 'divide') {
         if (num2 !== 0) {
-            return divide(num1, num2);
+            return divide(num1, num2);     // WIP - division by zero is disallowed but operator doing nothing breaks it regardless
         }
     }
     else if (operator == 'x') {
