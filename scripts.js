@@ -37,8 +37,9 @@ function operate(operator, num1, num2) {
     }
     else if (operator == 'divide') {
         if (num2 !== 0) {
-            return divide(num1, num2);     // WIP - division by zero is disallowed but operator doing nothing breaks it regardless
+            return divide(num1, num2);    
         }
+        return 'Error!'
     }
     else if (operator == 'x') {
         return multiply(num1, num2);
@@ -51,24 +52,29 @@ const numberButtons = document.querySelectorAll('.num');
 
 numberButtons.forEach(button => {
     button.addEventListener('click', () => {
-        displayNumber(button);
+        displayNumber(button.textContent);
     });
 });
 
-function displayNumber(button) {
-    if (display.textContent == '0') {
+function displayNumber(number) {
+    if (display.textContent == '0' || display.textContent == 'Error!') {
         clearDisplay();
     }
+    if (number == '.' && display.textContent.indexOf('.') >= 0) {  // Make sure no decimal points can be entered if there's already one there
+        return;
+    }
+
     if (pending) {
         buffer = makeNumber(display.textContent);
         clearDisplay();
         pending = null;
     }
     if (display.textContent.length < 12) {
-        display.textContent += (button.textContent);
+        display.textContent += number;
         pending = null;
     }
 }
+
 
 // Make operators work
 
@@ -81,7 +87,7 @@ operatorButtons.forEach(button => {
 });
 
 function dealWithOperator(button) {
-    let num = makeNumber(display.textContent);
+    let num = (display.textContent == 'Error!') ? 0 : makeNumber(display.textContent); 
     if (!buffer) {
         buffer = num;
     }
@@ -119,7 +125,7 @@ inPlaceButtons.forEach(button => {
 
 function operateInPlace(button) {
     let op = button.id;
-    let num = makeNumber(display.textContent);
+    let num = (display.textContent == 'Error!') ? 0 : makeNumber(display.textContent);
     let disp = display.textContent;
     if (op == 'percent') {
         display.textContent = num / 100;
@@ -133,7 +139,9 @@ function operateInPlace(button) {
         }        
     }
     else if (op == 'invert') {
-        display.textContent = 1 / num;
+        if (num !== 0) {
+            display.textContent = 1 / num;
+        } else {display.textContent = 'Error!'}
     }
     else if (op == 'square') {
         display.textContent = num ** 2;
@@ -178,3 +186,13 @@ function makeNumber(content) {
 function clearDisplay() {
     display.textContent = '';
 }
+
+// Keyboard support
+
+document.addEventListener('keydown', (event) => {
+    const keyName = event.key;
+    if (!isNaN(keyName)) {
+        displayNumber(keyName);
+    }
+    console.log(keyName);
+});
