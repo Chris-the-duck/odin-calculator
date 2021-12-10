@@ -1,3 +1,7 @@
+// WIP: Something is fundamentally broken with the "pending" logic, I was just able to keep entering numbers and hitting enter and it kept adding them for no reason
+// Annd trying to reproduce with click input rather than keyboard broke it entirely
+// Rethink equals button logic, that thing is a piece of shit
+
 // Variables that will be used over and over
 
 let operator;
@@ -82,7 +86,7 @@ const operatorButtons = document.querySelectorAll('.operator');
 
 operatorButtons.forEach(button => {
     button.addEventListener('click', () => {
-        dealWithOperator(button);
+        dealWithOperator(button.id);
     });
 });
 
@@ -97,13 +101,17 @@ function dealWithOperator(button) {
         buffer = result;
     }
     pending = 1;
-    operator = button.id;
+    operator = button;
 }
 
 // Equals sign button
 
 const equalsButton = document.querySelector('.equals');
 equalsButton.addEventListener('click', () => {
+    equalsFunction();       // needs to be separate named function so I can call it on keyboard input
+});
+
+function equalsFunction() {
     if (operator && buffer) {
         let num = makeNumber(display.textContent);
         let result = operate(operator, buffer, num);
@@ -111,26 +119,25 @@ equalsButton.addEventListener('click', () => {
         buffer = null;
         operator = null;
         pending = 1;        // Pending even though no operation is pending, because if user
-    }                       // enters new numbers here, it should do new calculation, not concatenate                   
-});
+    }                       // enters new numbers here, it should do new calculation, not concatenate      
+}
 
 // In place operators
 
 const inPlaceButtons = document.querySelectorAll('.inPlaceOp')
 inPlaceButtons.forEach(button => {
     button.addEventListener('click', () => {
-        operateInPlace(button);
+        operateInPlace(button.id);
     });
 });
 
-function operateInPlace(button) {
-    let op = button.id;
+function operateInPlace(action) {
     let num = (display.textContent == 'Error!') ? 0 : makeNumber(display.textContent);
     let disp = display.textContent;
-    if (op == 'percent') {
+    if (action == 'percent') {
         display.textContent = num / 100;
     }
-    else if (op == 'backspace') {
+    else if (action == 'backspace') {
         if (display.textContent.length == 1) {
             display.textContent = 0;
         }
@@ -138,18 +145,18 @@ function operateInPlace(button) {
             display.textContent = disp.slice(0, -1);
         }        
     }
-    else if (op == 'invert') {
+    else if (action == 'invert') {
         if (num !== 0) {
             display.textContent = 1 / num;
         } else {display.textContent = 'Error!'}
     }
-    else if (op == 'square') {
+    else if (action == 'square') {
         display.textContent = num ** 2;
     }
-    else if (op == 'sqrt') {
+    else if (action == 'sqrt') {
         display.textContent = Math.sqrt(num);
     }
-    else if (op == 'neg') {
+    else if (action == 'neg') {
         display.textContent = - num;
     }
 }
@@ -191,8 +198,23 @@ function clearDisplay() {
 
 document.addEventListener('keydown', (event) => {
     const keyName = event.key;
-    if (!isNaN(keyName)) {
+    if (!isNaN(keyName) || keyName == '.') {
         displayNumber(keyName);
+    }
+    if (keyName == 'Backspace') {
+        operateInPlace('backspace');       /* I should've made the button IDs the same as the keyboard input names, but OH WELL */
+    }
+    if (keyName == 'Enter') {
+        equalsFunction();
+    }
+    if (keyName == '+' || keyName == '-') {
+        dealWithOperator(keyName);
+    }
+    if (keyName == '/') {
+        dealWithOperator('divide');
+    }
+    if (keyName == '*') {
+        dealWithOperator('x');
     }
     console.log(keyName);
 });
