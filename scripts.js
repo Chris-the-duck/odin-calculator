@@ -1,13 +1,9 @@
-// WIP: Something is fundamentally broken with the "pending" logic, I was just able to keep entering numbers and hitting enter and it kept adding them for no reason
-// Annd trying to reproduce with click input rather than keyboard broke it entirely
-// Rethink equals button logic, that thing is a piece of shit
-
 // Variables that will be used over and over
 
 let operator;
 let buffer;
 let pending;
-let wipeIt;
+let lastButtonPressed;
 
 const display = document.querySelector('.display');
 display.textContent = '0';
@@ -69,14 +65,17 @@ function displayNumber(number) {
     }
 
     if (pending) {
-        buffer = makeNumber(display.textContent);
+        if (operator) {
+            buffer = makeNumber(display.textContent);}
         clearDisplay();
         pending = null;
     }
     if (display.textContent.length < 12) {
+        if (number == '.' && display.textContent == '') {display.textContent += 0;}
         display.textContent += number;
         pending = null;
     }
+    lastButtonPressed = 'num';
 }
 
 
@@ -95,13 +94,14 @@ function dealWithOperator(button) {
     if (!buffer) {
         buffer = num;
     }
-    else {
+    else if (lastButtonPressed !== 'op') {
         let result = operate(operator, buffer, num);
         display.textContent = result;
         buffer = result;
     }
     pending = 1;
     operator = button;
+    lastButtonPressed = 'op'
 }
 
 // Equals sign button
@@ -112,14 +112,15 @@ equalsButton.addEventListener('click', () => {
 });
 
 function equalsFunction() {
-    if (operator && buffer) {
+    if (operator && buffer && !pending && lastButtonPressed !== 'op') {
         let num = makeNumber(display.textContent);
         let result = operate(operator, buffer, num);
         display.textContent = result;
         buffer = null;
         operator = null;
         pending = 1;        // Pending even though no operation is pending, because if user
-    }                       // enters new numbers here, it should do new calculation, not concatenate      
+    }                       // enters new numbers here, it should do new calculation, not concatenate
+    lastButtonPressed = 'eq';
 }
 
 // In place operators
@@ -159,6 +160,7 @@ function operateInPlace(action) {
     else if (action == 'neg') {
         display.textContent = - num;
     }
+    lastButtonPressed = 'oip';
 }
 
 // CE and CE buttons
@@ -216,5 +218,7 @@ document.addEventListener('keydown', (event) => {
     if (keyName == '*') {
         dealWithOperator('x');
     }
-    console.log(keyName);
+    if (keyName == ',') {            /* otherwise numpad decimal point won't work for ppl using German keyboard layout like me */
+        displayNumber('.');
+    }
 });

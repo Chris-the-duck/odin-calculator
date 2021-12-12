@@ -22,7 +22,7 @@ body {
     background-color: #fff;
     width: 100%;
     text-align: right;
-    margin-bottom: 5px;
+    margin-bottom: 10px;
     font-size: 30px;
     font-family: 'Orbitron', sans-serif;
 }
@@ -38,4 +38,17 @@ button {
     display: flex;
     justify-content: space-between;
     padding: 2px 0px;
+}
+
+.num {
+    background-color: rgb(184, 205, 245);
+}
+
+.operator, .inPlaceOp {
+    background-color: rgb(233, 196, 248);
+}
+
+
+.delete, #backspace {
+    background-color: rgb(255, 198, 198);
 }
